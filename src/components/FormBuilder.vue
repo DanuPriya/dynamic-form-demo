@@ -46,8 +46,40 @@
       />
       <br />
     </label>
+    <br />
+    <label>Select Language:</label>
+    <Select
+      :options="languages"
+      v-model="selectedLanguage"
+      placeholder="Select Language"
+      required="true"
+      ref="selectedLanguage"
+    />
+    <br />
+    <label>Radio Button:</label>
 
+    <radio-btn
+      name="male"
+      label="Male"
+      :value="selectedValue"
+      @change="changeValue"
+      ref="male"
+      required="true"
+    />
+    <radio-btn
+      name="female"
+      label="Female"
+      :value="selectedValue"
+      @change="changeValue"
+      ref="female"
+      required="true"
+    />
+    <br />
+    <check-box v-model="isChecked" ref="isChecked" required="true" />Accept
+    <br />
+    <br />
     <Button @click="submitBtn" text="Submit" />
+    <br />
     <br />
     <br />
 
@@ -59,15 +91,23 @@
       E-mail: {{email}}
       <br />
       Password: {{password}}
+      <br />
+      SelectedLanguage: {{selectedLanguage}}
+      <br />
+      Radio button selection: {{selectedValue}}
+      <br />
+      CheckBox Value: {{isChecked}}
     </p>
-    <br />
-    <br />
   </div>
 </template>
 
 <script>
 import Button from "../components/FormElements/Button.vue";
 import Input from "../components/FormElements/Input.vue";
+import Select from "../components/FormElements/Select.vue";
+import RadioBtn from "../components/FormElements/RadioBtn.vue";
+
+import CheckBox from "../components/FormElements/CheckBox.vue";
 
 export default {
   name: "FormBuilder",
@@ -77,10 +117,17 @@ export default {
       lastname: "",
       password: "",
       email: "",
-      formSubmitted: false
+      formSubmitted: false,
+      languages: ["English", "Hindi", "Punjabi"],
+      selectedLanguage: "",
+      selectedValue: "",
+      isChecked: false
     };
   },
   methods: {
+    changeValue(newValue) {
+      this.selectedValue = newValue;
+    },
     submitBtn() {
       this.formSubmitted = false;
       this.$refs.firstname.validateForm();
@@ -102,12 +149,32 @@ export default {
       if (this.$refs.password.errorMessage) {
         return;
       }
+
+      this.$refs.selectedLanguage.validateForm();
+      if (this.$refs.selectedLanguage.errorMessage) {
+        return;
+      }
+      this.$refs.male.validateForm();
+      if (this.$refs.male.errorMessage) {
+        return;
+      }
+      this.$refs.female.validateForm();
+      if (this.$refs.female.errorMessage) {
+        return;
+      }
+      this.$refs.isChecked.validateForm();
+      if (this.$refs.isChecked.errorMessage) {
+        return;
+      }
       this.formSubmitted = true;
     }
   },
   components: {
     Input,
-    Button
+    Button,
+    Select,
+    RadioBtn,
+    CheckBox
   }
 };
 </script>

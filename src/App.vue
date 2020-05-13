@@ -1,20 +1,19 @@
 <template>
-  <div id="app">
-    <form-builder />
-  </div>
+
+  <v-app>
+    <nav-bar />
+    <router-view> </router-view>
+ </v-app>
+ 
+ 
 </template>
-
 <script>
-import FormBuilder from "./components/FormBuilder.vue";
-
+import NavBar from './components/NavBar.vue'
 export default {
-  name: "App",
-
-  components: {
-    FormBuilder
+  components:{
+    NavBar
   }
-};
-</script>
 
-<style>
-</style>
+  
+}
+</script>
