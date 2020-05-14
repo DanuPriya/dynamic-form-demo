@@ -1,107 +1,116 @@
 <template>
   <div id="form">
-    <label>
-      First Name:
-      <Input
-        v-model="firstname"
-        placeholder="Enter First Name"
-        min-length="3"
-        ref="firstname"
-        required="true"
-      />
-      <br />
-    </label>
-    <label>
-      Last Name:
-      <Input
-        v-model="lastname"
-        placeholder="Enter Last Name"
-        min-length="3"
-        ref="lastname"
-        required="true"
-      />
-      <br />
-    </label>
-    <label>
-      Email:
-      <Input
-        type="email"
-        v-model="email"
-        placeholder="Enter Email"
-        min-length="8"
-        ref="email"
-        required="true"
-      />
-      <br />
-    </label>
-    <label>
-      Password:
-      <Input
-        type="password"
-        v-model="password"
-        placeholder="Password"
-        min-length="8"
-        ref="password"
-        required="true"
-      />
-      <br />
-    </label>
-    <br />
-    <label>Select Language:</label>
-    <Select
-      :options="languages"
-      v-model="selectedLanguage"
-      placeholder="Select Language"
-      required="true"
-      ref="selectedLanguage"
-    />
-    <br />
-    <label>Radio Button:</label>
+    <div class="form-group" :class="{ 'form-group--error': $v.firstname.$error }">
+      <label>
+        First Name:
+        <Input
+          class="form-control"
+          v-model.trim="$v.firstname.$model"
+          placeholder="Enter First Name"
+        />
+        <br />
+      </label>
+    </div>
+    <div class="error" v-if="!$v.firstname.required">First Name is required</div>
+    <div
+      class="error"
+      v-if="!$v.firstname.minLength"
+    >First Name must have at least {{$v.firstname.$params.minLength.min}} letters.</div>
 
-    <radio-btn
-      name="male"
-      label="Male"
-      :value="selectedValue"
-      @change="changeValue"
-      ref="male"
-      required="true"
-    />
-    <radio-btn
-      name="female"
-      label="Female"
-      :value="selectedValue"
-      @change="changeValue"
-      ref="female"
-      required="true"
-    />
-    <br />
-    <check-box v-model="isChecked" ref="isChecked" required="true" />Accept
-    <br />
-    <br />
-    <Button @click="submitBtn" text="Submit" />
-    <br />
-    <br />
-    <br />
+    <div class="form-group" :class="{ 'form-group--error': $v.lastname.$error }">
+      <label>
+        Last Name:
+        <Input
+          class="form-control"
+          v-model.trim="$v.lastname.$model"
+          placeholder="Enter Last Name"
+        />
+        <br />
+      </label>
+    </div>
+    <div class="error" v-if="!$v.lastname.required">Last Name is required</div>
+    <div
+      class="error"
+      v-if="!$v.lastname.minLength"
+    >Last Name must have at least {{$v.lastname.$params.minLength.min}} letters.</div>
 
-    <p v-if="formSubmitted">
-      First Name:{{firstname}}
-      <br />
-      Last Name: {{lastname}}
-      <br />
-      E-mail: {{email}}
-      <br />
-      Password: {{password}}
-      <br />
-      SelectedLanguage: {{selectedLanguage}}
-      <br />
-      Radio button selection: {{selectedValue}}
-      <br />
-      CheckBox Value: {{isChecked}}
-    </p>
+    <div class="form-group" :class="{ 'form-group--error': $v.email.$error }">
+      <label>
+        Email:
+        <Input
+          class="form-control"
+          type="email"
+          v-model.trim="$v.email.$model"
+          placeholder="Email"
+        />
+        <br />
+      </label>
+    </div>
+    <div class="error" v-if="!$v.email.required">Email is required.</div>
+    <div class="error" v-if="!$v.email.email">Email is invalid</div>
+
+    <div class="form-group" :class="{ 'form-group--error': $v.password.$error }">
+      <label>
+        Password:
+        <Input type="password" class="form-control" v-model.trim="$v.password.$model" />
+        <br />
+      </label>
+    </div>
+    <div class="error" v-if="!$v.password.required">Password is required</div>
+    <div
+      class="error"
+      v-if="!$v.password.minLength"
+    >Password must have at least {{$v.password.$params.minLength.min}} letters.</div>
+
+    <div class="form-group" :class="{ 'form-group--error': $v.selectedLanguage.$error }">
+      <label>Select Language:</label>
+      <Select
+        :options="languages"
+        class="form-control form-control-sm"
+        v-model="selectedLanguage"
+        placeholder="Select Language"
+      />
+    </div>
+    <div class="error" v-if="!$v.selectedLanguage.required">Item is required</div>
+
+    <div class="form-group" :class="{ 'form-group--error': $v.isChecked.$error }">
+      <label>Do You Agree ?</label>
+      <check-box class="form-control" v-model="isChecked" />
+    </div>
+    <div class="error" v-if="!$v.isChecked.required">You must Agree to continue</div>
+
+    <div class="form-group" :class="{ 'form-group--error': $v.selectedValue.$error }">
+      <label>Radio Button:</label>
+
+      <radio-btn
+        class="form-control"
+        name="male"
+        label="Male"
+        :value="selectedValue"
+        @change="changeValue"
+      />
+      <radio-btn
+        class="form-control"
+        name="female"
+        label="Female"
+        :value="selectedValue"
+        @change="changeValue"
+      />
+    </div>
+    <div class="error" v-if="!$v.selectedValue.required">Please pick the one.</div>
+
+    <br />
+    <br />
+    <Button class="btn btn-primary" @click="submit" text="Submit" />
+
+    <p class="typo__p" v-if="submitStatus === 'OK'">Thanks for your submission!</p>
+    <p class="typo__p" v-if="submitStatus === 'ERROR'">Please fill the form correctly.</p>
+    <p class="typo__p" v-if="submitStatus === 'PENDING'">Sending...</p>
   </div>
 </template>
 
 <script>
+import { required, minLength, email } from "vuelidate/lib/validators";
 import Button from "../components/FormElements/Button.vue";
 import Input from "../components/FormElements/Input.vue";
 import Select from "../components/FormElements/Select.vue";
@@ -115,83 +124,65 @@ export default {
     return {
       firstname: "",
       lastname: "",
-      password: "",
       email: "",
-      formSubmitted: false,
-      languages: ["English", "Hindi", "Punjabi"],
+      password: "",
       selectedLanguage: "",
-      selectedValue: "",
-      isChecked: false
+      languages: ["Hindi", "English", "Punjabi"],
+      submitStatus: null,
+      isChecked: "",
+      selectedValue: ""
     };
+  },
+
+  components: {
+    Input,
+    Select,
+    Button,
+    CheckBox,
+    RadioBtn
+  },
+  validations: {
+    firstname: {
+      required,
+      minLength: minLength(4)
+    },
+    lastname: {
+      required,
+      minLength: minLength(4)
+    },
+    password: {
+      required,
+      minLength: minLength(8)
+    },
+    selectedLanguage: { required },
+    isChecked: { required },
+    selectedValue: { required },
+    email: { required, email }
   },
   methods: {
     changeValue(newValue) {
       this.selectedValue = newValue;
     },
-    submitBtn() {
-      this.formSubmitted = false;
-      this.$refs.firstname.validateForm();
-      if (this.$refs.firstname.errorMessage) {
-        return;
+    submit() {
+      console.log("submit!");
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        this.submitStatus = "ERROR";
+      } else {
+        // do your submit logic here
+        this.submitStatus = "PENDING";
+        setTimeout(() => {
+          this.submitStatus = "OK";
+        }, 500);
       }
-
-      this.$refs.lastname.validateForm();
-      if (this.$refs.lastname.errorMessage) {
-        return;
-      }
-
-      this.$refs.email.validateForm();
-      if (this.$refs.email.errorMessage) {
-        return;
-      }
-
-      this.$refs.password.validateForm();
-      if (this.$refs.password.errorMessage) {
-        return;
-      }
-
-      this.$refs.selectedLanguage.validateForm();
-      if (this.$refs.selectedLanguage.errorMessage) {
-        return;
-      }
-      this.$refs.male.validateForm();
-      if (this.$refs.male.errorMessage) {
-        return;
-      }
-      this.$refs.female.validateForm();
-      if (this.$refs.female.errorMessage) {
-        return;
-      }
-      this.$refs.isChecked.validateForm();
-      if (this.$refs.isChecked.errorMessage) {
-        return;
-      }
-      this.formSubmitted = true;
     }
-  },
-  components: {
-    Input,
-    Button,
-    Select,
-    RadioBtn,
-    CheckBox
   }
 };
 </script>
-
-<style>
+<style lang="scss">
 #form {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-button {
-  padding: 9px 16px;
-  background: #0060cc;
-  color: #fff;
-  border: 1px solid #0d0dff;
+  background: #efefef;
+  padding: 2rem 2rem 1rem;
 }
 </style>
+
